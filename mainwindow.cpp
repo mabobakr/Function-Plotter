@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -33,12 +34,12 @@ double MainWindow::applyOp(double a, double b, QChar op){
 }
 
 
-bool MainWindow::generateXY(QVector<double> &x, QVector<double> &y, QString &text){
+void MainWindow::generateXY(QVector<double> &x, QVector<double> &y, QString &text){
 
     double xMin = ui ->xMin->value(), xMax = ui ->xMax->value();
 
     // Check if range is valid
-    if (xMin >= xMax) return false;
+    if (xMin >= xMax) throw "Max must be higher than Min";
 
     int n = x.size();
     for (int i = 0; i < x.size(); i++){
@@ -47,9 +48,8 @@ bool MainWindow::generateXY(QVector<double> &x, QVector<double> &y, QString &tex
 
         // Evaluate expression to get corresponding y
         y[i] = evalExpression(text, x[i]);
-        qDebug() << x[i] << y[i];
+        //qDebug() << x[i] << y[i];
     }
-    return true;
 }
 
 bool isOp(QChar x){
@@ -66,12 +66,17 @@ int preced(QChar x) {
 double MainWindow::evalExpression(QString &text, double x){
     QChar op;
     double a, b;
+    int n = text.size();
     int temp = 0;
     QStack<double> values;
     QStack<QChar> operators;
 
+    if (isOp(text[0]) || isOp(text[n - 1])){
+            throw "Invalid expression: function cannot start or end with an operator";
+    }
 
-    for (int i = 0, n = text.size(); i < n; i++){
+    bool lastOp = false;
+    for (int i = 0; i < n; i++){
         if (text[i].isDigit()) {
             // push whole number to values stack
             temp = text[i].digitValue();
@@ -81,10 +86,15 @@ double MainWindow::evalExpression(QString &text, double x){
             }
 
             values.push(temp);
+            lastOp = false;
         }
-        else if (text[i] == 'x')
+        else if (text[i] == 'x') {
+            lastOp = false;
             values.push(x);
+        }
         else if (isOp(text[i])){
+            if (lastOp) throw "Invalid expression, Please make sure to enter a correct mathematical expression";
+            lastOp = true;
             // Solve prior operators with higher or equal precedence
             while (!operators.isEmpty() && preced(operators.top()) >= preced(text[i])){
                 op = operators.pop();
@@ -97,8 +107,7 @@ double MainWindow::evalExpression(QString &text, double x){
             operators.push(text[i]);
         }
         else {
-            //invalid symbol
-            qDebug() << "Text contains invalid symbols";
+            throw "Invalid input: only valid symbols are +,_,*,^,/ and numeric digits";
         }
     }
 
@@ -133,21 +142,27 @@ void MainWindow::plot(QVector<double> &x, QVector<double> &y) {
 
 void MainWindow::on_pushButton_clicked()
 {
-    QString text = ui ->lineEdit->text();
-    if (text == "") return;
+    try {
+        QString text = ui ->lineEdit->text();
+        if (text == "") return;
 
-    text.remove(' ');
-    text = text.toLower();
+        text.remove(' ');
+        text = text.toLower();
 
-    // size of data in the range
-    int size = 100;
-    QVector<double> x(size), y(size);
+        // size of data in the range
+        int size = 100;
+        QVector<double> x(size), y(size);
 
-    if (!generateXY(x, y, text)){
-        qDebug("Error: Max value must be higher than minimum value");
+        generateXY(x, y, text);
+
+        plot(x, y);
+    }
+    catch (const char *msg) {
+        QMessageBox msgBox;
+        msgBox.setText(msg);
+        msgBox.exec();
     }
 
-    plot(x, y);
 
 }
 

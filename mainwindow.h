@@ -22,7 +22,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
-    bool generateXY(QVector<double> &x, QVector<double> &y, QString &text);
+    void generateXY(QVector<double> &x, QVector<double> &y, QString &text);
     double evalExpression(QString &text, double x);
     void plot(QVector<double> &x, QVector<double> &y);
 
