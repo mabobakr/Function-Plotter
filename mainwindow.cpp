@@ -14,22 +14,120 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+// Applies one of the allowed operations on 2 operands
+float MainWindow::applyOp(float a, float b, QChar op){
+    switch(op.unicode()) {
+    case '+':
+        return a + b;
+    case '-':
+        return a - b;
+    case '*':
+        return a * b;
+    case '/':
+        return a / b;
+    case '^':
+        return pow(a, b);
+    default:
+        return -1;
+    }
+}
+
+
+bool MainWindow::generateXY(QVector<float> &x, QVector<float> &y, QString &text){
+
+    float xMin = ui ->xMin->value(), xMax = ui ->xMax->value();
+
+    // Check if range is valid
+    if (xMin >= xMax) return false;
+
+    int n = x.size();
+    for (int i = 0; i < x.size(); i++){
+        // Create range of x from xMin to xMax (linear equation in i)
+        x[i] = xMin + i * (xMax-xMin) / (n-1);
+
+        // Evaluate expression to get corresponding y
+        y[i] = evalExpression(text, x[i]);
+        qDebug() << x[i] << y[i];
+    }
+    return true;
+}
+
+bool isOp(QChar x){
+    return (x == '+' || x == '-' || x == '*' || x == '/' || x == '^');
+}
+
+// Determine the precedence of an operator
+int preced(QChar x) {
+    return (x == '^')? 3 :
+           (x == '*' || x == '/')? 2 : 1;
+}
+
+// evaluate the expression to get y of the given x
+float MainWindow::evalExpression(QString &text, float x){
+    QChar op;
+    float a, b;
+    int temp = 0;
+    QStack<float> values;
+    QStack<QChar> operators;
+
+
+    for (int i = 0, n = text.size(); i < n; i++){
+        if (text[i].isDigit()) {
+            // push whole number to values stack
+            temp = text[i].digitValue();
+            while(i+1 < n && text[i+1].isDigit()){
+                i++;
+                temp = 10 * temp + text[i].digitValue();
+            }
+
+            values.push(temp);
+        }
+        else if (text[i] == 'x')
+            values.push(x);
+        else if (isOp(text[i])){
+            // Solve prior operators with higher or equal precedence
+            while (!operators.isEmpty() && preced(operators.top()) >= preced(text[i])){
+                op = operators.pop();
+                b = values.pop();
+                a = values.pop();
+                values.push(applyOp(a, b, op));
+            }
+
+            // push current operator
+            operators.push(text[i]);
+        }
+        else {
+            //invalid symbol
+            qDebug() << "Text contains invalid symbols";
+        }
+    }
+
+    // Solve remaining operators
+    while (!operators.isEmpty()) {
+        op = operators.pop();
+        b = values.pop();
+        a = values.pop();
+        values.push(applyOp(a, b, op));
+    }
+
+    return values.pop();
+}
 
 void MainWindow::on_pushButton_clicked()
 {
     QString text = ui ->lineEdit->text();
+    if (text == "") return;
 
-    // Extract each term
     text.remove(' ');
-    QRegularExpression reg("[\\+\\-\\*\\/\\^]");
-    QStringList terms = text.split(reg, Qt::SkipEmptyParts);
+    text = text.toLower();
 
-    // to do: 1- check all terms are either X or numeric
-    // 2-Save the sequence of operators and validate their order
-    // 3- Generate Y & X
-    // 4- plot
+    // size of data in the range
+    int size = 100;
+    QVector<float> x(size), y(size);
 
-    for (int i = 0; i < terms.size(); i++)
-        qDebug(terms[i].toUtf8());
+    if (!generateXY(x, y, text)){
+        qDebug("Error: Max value must be higher than minimum value");
+    }
+
 }
 

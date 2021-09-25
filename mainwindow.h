@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QStack>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -20,5 +21,11 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+
+    bool generateXY(QVector<float> &x, QVector<float> &y, QString &text);
+    float evalExpression(QString &text, float x);
+
+    float applyOp(float a, float b, QChar op);
+
 };
 #endif // MAINWINDOW_H
