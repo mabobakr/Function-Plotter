@@ -15,7 +15,7 @@ MainWindow::~MainWindow()
 }
 
 // Applies one of the allowed operations on 2 operands
-float MainWindow::applyOp(float a, float b, QChar op){
+double MainWindow::applyOp(double a, double b, QChar op){
     switch(op.unicode()) {
     case '+':
         return a + b;
@@ -33,9 +33,9 @@ float MainWindow::applyOp(float a, float b, QChar op){
 }
 
 
-bool MainWindow::generateXY(QVector<float> &x, QVector<float> &y, QString &text){
+bool MainWindow::generateXY(QVector<double> &x, QVector<double> &y, QString &text){
 
-    float xMin = ui ->xMin->value(), xMax = ui ->xMax->value();
+    double xMin = ui ->xMin->value(), xMax = ui ->xMax->value();
 
     // Check if range is valid
     if (xMin >= xMax) return false;
@@ -63,11 +63,11 @@ int preced(QChar x) {
 }
 
 // evaluate the expression to get y of the given x
-float MainWindow::evalExpression(QString &text, float x){
+double MainWindow::evalExpression(QString &text, double x){
     QChar op;
-    float a, b;
+    double a, b;
     int temp = 0;
-    QStack<float> values;
+    QStack<double> values;
     QStack<QChar> operators;
 
 
@@ -113,6 +113,24 @@ float MainWindow::evalExpression(QString &text, float x){
     return values.pop();
 }
 
+void MainWindow::plot(QVector<double> &x, QVector<double> &y) {
+   // add graph & set data
+   ui ->plotWidget->addGraph();
+   ui ->plotWidget->graph(0)->setData(x, y);
+
+   // set labels
+   ui ->plotWidget->xAxis->setLabel("X");
+   ui ->plotWidget->yAxis->setLabel("Y");
+
+   int n = x.size();
+   // set range for each axis
+   ui->plotWidget->xAxis->setRange(x[0], x[n-1]);
+   ui->plotWidget->yAxis->setRange(y[0], y[n-1]);
+
+   // plot
+   ui ->plotWidget ->replot();
+}
+
 void MainWindow::on_pushButton_clicked()
 {
     QString text = ui ->lineEdit->text();
@@ -123,11 +141,13 @@ void MainWindow::on_pushButton_clicked()
 
     // size of data in the range
     int size = 100;
-    QVector<float> x(size), y(size);
+    QVector<double> x(size), y(size);
 
     if (!generateXY(x, y, text)){
         qDebug("Error: Max value must be higher than minimum value");
     }
+
+    plot(x, y);
 
 }
 

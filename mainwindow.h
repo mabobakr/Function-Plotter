@@ -22,10 +22,11 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
-    bool generateXY(QVector<float> &x, QVector<float> &y, QString &text);
-    float evalExpression(QString &text, float x);
+    bool generateXY(QVector<double> &x, QVector<double> &y, QString &text);
+    double evalExpression(QString &text, double x);
+    void plot(QVector<double> &x, QVector<double> &y);
 
-    float applyOp(float a, float b, QChar op);
+    double applyOp(double a, double b, QChar op);
 
 };
 #endif // MAINWINDOW_H
