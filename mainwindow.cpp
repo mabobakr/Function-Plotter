@@ -2,6 +2,7 @@
 #include "./ui_mainwindow.h"
 #include <QMessageBox>
 
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -16,7 +17,7 @@ MainWindow::~MainWindow()
 }
 
 // Applies one of the allowed operations on 2 operands
-double MainWindow::applyOp(double a, double b, QChar op){
+double applyOp(double a, double b, QChar op){
     switch(op.unicode()) {
     case '+':
         return a + b;
@@ -34,6 +35,16 @@ double MainWindow::applyOp(double a, double b, QChar op){
 }
 
 
+bool isOp(QChar x){
+    return (x == '+' || x == '-' || x == '*' || x == '/' || x == '^');
+}
+
+// Determine the precedence of an operator
+int preced(QChar x) {
+    return (x == '^')? 3 :
+           (x == '*' || x == '/')? 2 : 1;
+}
+
 void MainWindow::generateXY(QVector<double> &x, QVector<double> &y, QString &text){
 
     double xMin = ui ->xMin->value(), xMax = ui ->xMax->value();
@@ -50,16 +61,6 @@ void MainWindow::generateXY(QVector<double> &x, QVector<double> &y, QString &tex
         y[i] = evalExpression(text, x[i]);
         //qDebug() << x[i] << y[i];
     }
-}
-
-bool isOp(QChar x){
-    return (x == '+' || x == '-' || x == '*' || x == '/' || x == '^');
-}
-
-// Determine the precedence of an operator
-int preced(QChar x) {
-    return (x == '^')? 3 :
-           (x == '*' || x == '/')? 2 : 1;
 }
 
 // evaluate the expression to get y of the given x
@@ -107,7 +108,7 @@ double MainWindow::evalExpression(QString &text, double x){
             operators.push(text[i]);
         }
         else {
-            throw "Only valid symbols are +,_,*,^,/ and numeric digits";
+            throw "Only valid symbols are + , - , * , ^ , / and numeric digits";
         }
     }
 
@@ -119,7 +120,7 @@ double MainWindow::evalExpression(QString &text, double x){
         values.push(applyOp(a, b, op));
     }
 
-    if (values.size() > 1) throw "Expression Can't have successive values without operators";
+    if (values.size() > 1) throw "Expression can't have successive values without operators";
     return values.pop();
 }
 
@@ -145,8 +146,9 @@ void MainWindow::on_pushButton_clicked()
 {
     try {
         QString text = ui ->lineEdit->text();
-        if (text == "") return;
+        if (text == "") throw "Please enter a function";
 
+        // remove whitespace & convert X to lowercase
         text.remove(' ');
         text = text.toLower();
 
@@ -154,11 +156,14 @@ void MainWindow::on_pushButton_clicked()
         int size = 100;
         QVector<double> x(size), y(size);
 
+        // Generate plotting data X and Y
         generateXY(x, y, text);
 
+        // Plot the function
         plot(x, y);
     }
     catch (const char *msg) {
+        // Display message in a message box
         QMessageBox msgBox;
         msgBox.setText(msg);
         msgBox.exec();

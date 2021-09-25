@@ -26,7 +26,5 @@ private:
     double evalExpression(QString &text, double x);
     void plot(QVector<double> &x, QVector<double> &y);
 
-    double applyOp(double a, double b, QChar op);
-
 };
 #endif // MAINWINDOW_H
