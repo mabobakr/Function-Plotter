@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QStack>
+#include "calculator.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -21,10 +21,6 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-
-    void generateXY(QVector<double> &x, QVector<double> &y, QString &text);
-    double evalExpression(QString &text, double x);
     void plot(QVector<double> &x, QVector<double> &y);
-
 };
 #endif // MAINWINDOW_H
