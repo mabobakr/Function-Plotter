@@ -72,7 +72,7 @@ double MainWindow::evalExpression(QString &text, double x){
     QStack<QChar> operators;
 
     if (isOp(text[0]) || isOp(text[n - 1])){
-            throw "Invalid expression: function cannot start or end with an operator";
+            throw "Function cannot start or end with an operator";
     }
 
     bool lastOp = false;
@@ -93,7 +93,7 @@ double MainWindow::evalExpression(QString &text, double x){
             values.push(x);
         }
         else if (isOp(text[i])){
-            if (lastOp) throw "Invalid expression, Please make sure to enter a correct mathematical expression";
+            if (lastOp) throw "Function can't have two successive operators";
             lastOp = true;
             // Solve prior operators with higher or equal precedence
             while (!operators.isEmpty() && preced(operators.top()) >= preced(text[i])){
@@ -107,7 +107,7 @@ double MainWindow::evalExpression(QString &text, double x){
             operators.push(text[i]);
         }
         else {
-            throw "Invalid input: only valid symbols are +,_,*,^,/ and numeric digits";
+            throw "Only valid symbols are +,_,*,^,/ and numeric digits";
         }
     }
 
@@ -119,6 +119,7 @@ double MainWindow::evalExpression(QString &text, double x){
         values.push(applyOp(a, b, op));
     }
 
+    if (values.size() > 1) throw "Expression Can't have successive values without operators";
     return values.pop();
 }
 
