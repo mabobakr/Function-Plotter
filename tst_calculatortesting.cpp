@@ -20,28 +20,17 @@ private slots:
     void test_isOp();
     void test_applyOp();
     void test_preced();
-
+    void test_evalExpression();
+    void test_calculateY();
 };
 
-CalculatorTesting::CalculatorTesting()
-{
+CalculatorTesting::CalculatorTesting(){}
 
-}
+CalculatorTesting::~CalculatorTesting(){}
 
-CalculatorTesting::~CalculatorTesting()
-{
+void CalculatorTesting::initTestCase(){}
 
-}
-
-void CalculatorTesting::initTestCase()
-{
-
-}
-
-void CalculatorTesting::cleanupTestCase()
-{
-
-}
+void CalculatorTesting::cleanupTestCase(){}
 
 void CalculatorTesting::test_constructor()
 {
@@ -90,6 +79,39 @@ void CalculatorTesting::test_preced(){
     QCOMPARE(preced('*'), 2);
     QCOMPARE(preced('/'), 2);
     QCOMPARE(preced('^'), 3);
+}
+
+void CalculatorTesting::test_evalExpression(){
+    double x = 1;
+
+    // invalid expression
+    Calculator c("3+", 0, 1, 3);
+    QVERIFY_EXCEPTION_THROWN(c.evalExpression(x), char *);
+
+    Calculator a("3+*x", 0, 1, 3);
+    QVERIFY_EXCEPTION_THROWN(a.evalExpression(x), char *);
+
+    Calculator b("3x", 0, 1, 3);
+    QVERIFY_EXCEPTION_THROWN(b.evalExpression(x), char *);
+
+    // valid expression with all allowed operators
+    Calculator d("x ^ 3 + 3 * x ^ 2 - 2 / x", 0, 1, 3);
+    double y = pow(x, 3) + 3 * pow(x, 2) - 2 / x;
+    QCOMPARE(d.evalExpression(x), y);
+}
+
+void CalculatorTesting::test_calculateY(){
+    int dataSize = 3;
+    double y;
+
+    Calculator d("3 * x ^ 2 / 2 + x - 4", 0, 1, dataSize);
+    d.calculateY();
+    for (int i = 0; i < dataSize; i++) {
+        // calculate y and compare with that of object for each x
+        y = 3 * pow(d.x[i], 2) / 2 + d.x[i] - 4;
+        QCOMPARE(d.y[i], y);
+    }
+
 }
 
 QTEST_MAIN(CalculatorTesting)

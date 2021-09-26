@@ -20,13 +20,12 @@ private:
 
     int dataSize;
 
-    double evalExpression(double x);
-
 public:
     QVector<double> x, y;
 
     Calculator();
     Calculator(QString text, double xMin, double xMax, int dataSize);
+    double evalExpression(double x);
     void calculateY();
 };
 
