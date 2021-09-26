@@ -5,6 +5,12 @@
 #include <QStack>
 #include <math.h>
 
+// Utility functions declaration
+bool isOp(QChar x);
+int preced(QChar x);
+double applyOp(double a, double b, QChar op);
+
+
 class Calculator
 {
 
