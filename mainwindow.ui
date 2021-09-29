@@ -146,10 +146,10 @@
      </rect>
     </property>
     <property name="minimum">
-     <double>-20000.000000000000000</double>
+     <double>-20000000.000000000000000</double>
     </property>
     <property name="maximum">
-     <double>20000.000000000000000</double>
+     <double>20000000.000000000000000</double>
     </property>
    </widget>
    <widget class="QLabel" name="label_4">
@@ -180,10 +180,10 @@
      </rect>
     </property>
     <property name="minimum">
-     <double>-20000.000000000000000</double>
+     <double>-20000000.000000000000000</double>
     </property>
     <property name="maximum">
-     <double>20000.000000000000000</double>
+     <double>20000000.000000000000000</double>
     </property>
    </widget>
   </widget>
