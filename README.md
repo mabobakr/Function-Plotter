@@ -1,6 +1,13 @@
 # Function-Plotter
 A function plotter using Qt framework
 
+## Requirements
+- [QT SDK](https://www.qt.io/download)
+
+## To Run tests
+Run Testing project (Testing.pro)
+
+
 ## Screenshots
 ![Working screen 1](/screenshots/Working%201.png) 
 
@@ -15,8 +22,3 @@ A function plotter using Qt framework
 ![Wrong screen 3](/screenshots/Wrong%203.png)
 
 
-## Requirements
-- [QT SDK](https://www.qt.io/download)
-
-## To Run tests
-Run Testing project (Testing.pro)
